@@ -19,6 +19,11 @@ export const tweetsData = [
         tweetText: `I need volunteers for a one-way mission to Mars 🪐. No experience necessary🚀`,
         replies: [
                   {
+                handle: `@kassimfrontend`,
+                profilePic: `images/metwimba.jpg`,
+                tweetText: `I am ready 💪🏼💪🏼💪🏼💪🏼!!`,
+            },
+                  {
                 handle: `@TomCruise ✅`,
                 profilePic: `images/tcruise.png`,
                 tweetText: `Yes! Sign me up! 😎🛩`,

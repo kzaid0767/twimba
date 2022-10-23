@@ -14,7 +14,22 @@ document.addEventListener('click', function(e){
     else if(e.target.id === 'tweet-btn'){
         handleTweetBtnClick()
     }
+    else if (e.target.dataset.delete){
+        handleDelete(e.target.dataset.delete)
+    }
+    else if (e.target.dataset.comment){
+        handleReplyText(e.target.dataset.comment)
+    }
 })
+
+function handleDelete(tweetId){
+    let tweetToDelete = tweetsData.filter(tweetObj=>
+        tweetObj.uuid === tweetId
+    )[0]
+    let deleteIndex = tweetsData.indexOf(tweetToDelete)
+    tweetsData.splice(deleteIndex,1)
+    render()
+}
  
 function handleLikeClick(tweetId){ 
     const targetTweetObj = tweetsData.filter(function(tweet){
@@ -50,13 +65,32 @@ function handleReplyClick(replyId){
     document.getElementById(`replies-${replyId}`).classList.toggle('hidden')
 }
 
+function handleReplyText(replyId){
+    let replyInput = document.getElementById(`reply-text-${replyId}`).value
+    if(replyInput){
+        const targetTweetObj = tweetsData.filter(tweet=>
+            tweet.uuid === replyId)[0]
+            console.log(targetTweetObj)
+            targetTweetObj.replies.unshift(
+                {
+                    handle: `@kassimfrontend`,
+                    profilePic: `images/metwimba.jpg`,
+                    tweetText: `${replyInput}`,
+                }
+            )
+        replyInput='' 
+        render()
+        handleReplyClick(replyId)
+    }
+}
+
 function handleTweetBtnClick(){
     const tweetInput = document.getElementById('tweet-input')
 
     if(tweetInput.value){
         tweetsData.unshift({
-            handle: `@Scrimba`,
-            profilePic: `images/scrimbalogo.png`,
+            handle: `@kassimfrontend`,
+            profilePic: `images/metwimba.jpg`,
             likes: 0,
             retweets: 0,
             tweetText: tweetInput.value,
@@ -106,7 +140,7 @@ function getFeedHtml(){
             })
         }
         
-          
+
         feedHtml += `
 <div class="tweet">
     <div class="tweet-inner">
@@ -133,10 +167,17 @@ function getFeedHtml(){
                     ></i>
                     ${tweet.retweets}
                 </span>
+                <span class="tweet-detail">
+                    <i class="fa-solid fa-trash"
+                    data-delete="${tweet.uuid}"
+                    ></i>
+                </span>
             </div>   
         </div>            
     </div>
     <div class="hidden" id="replies-${tweet.uuid}">
+          <textarea id="reply-text-${tweet.uuid}" placeholder="Reply here.."></textarea>
+          <button id="tweetreply-btn" data-comment="${tweet.uuid}">Reply</button>  
         ${repliesHtml}
     </div>   
 </div>
