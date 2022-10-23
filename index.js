@@ -1,5 +1,11 @@
-import { tweetsData } from './data.js'
+import { allData } from './data.js'
 import { v4 as uuidv4 } from 'https://jspm.dev/uuid';
+
+if(!JSON.parse(localStorage.getItem('tweetsData'))){
+    localStorage.setItem('tweetsData', JSON.stringify(allData))
+}
+//let tweetsData=JSON.parse(localStorage.getItem('tweetsData'))
+ 
 
 document.addEventListener('click', function(e){
     if(e.target.dataset.like){
@@ -23,15 +29,18 @@ document.addEventListener('click', function(e){
 })
 
 function handleDelete(tweetId){
+    let tweetsData=JSON.parse(localStorage.getItem('tweetsData'))
     let tweetToDelete = tweetsData.filter(tweetObj=>
         tweetObj.uuid === tweetId
     )[0]
     let deleteIndex = tweetsData.indexOf(tweetToDelete)
     tweetsData.splice(deleteIndex,1)
+    localStorage.setItem('tweetsData', JSON.stringify(tweetsData))
     render()
 }
  
-function handleLikeClick(tweetId){ 
+function handleLikeClick(tweetId){
+    let tweetsData=JSON.parse(localStorage.getItem('tweetsData')) 
     const targetTweetObj = tweetsData.filter(function(tweet){
         return tweet.uuid === tweetId
     })[0]
@@ -43,10 +52,12 @@ function handleLikeClick(tweetId){
         targetTweetObj.likes++ 
     }
     targetTweetObj.isLiked = !targetTweetObj.isLiked
+    localStorage.setItem('tweetsData', JSON.stringify(tweetsData))
     render()
 }
 
 function handleRetweetClick(tweetId){
+    let tweetsData=JSON.parse(localStorage.getItem('tweetsData')) 
     const targetTweetObj = tweetsData.filter(function(tweet){
         return tweet.uuid === tweetId
     })[0]
@@ -58,6 +69,7 @@ function handleRetweetClick(tweetId){
         targetTweetObj.retweets++
     }
     targetTweetObj.isRetweeted = !targetTweetObj.isRetweeted
+    localStorage.setItem('tweetsData', JSON.stringify(tweetsData))
     render() 
 }
 
@@ -66,11 +78,11 @@ function handleReplyClick(replyId){
 }
 
 function handleReplyText(replyId){
+    let tweetsData=JSON.parse(localStorage.getItem('tweetsData')) 
     let replyInput = document.getElementById(`reply-text-${replyId}`).value
     if(replyInput){
         const targetTweetObj = tweetsData.filter(tweet=>
             tweet.uuid === replyId)[0]
-            console.log(targetTweetObj)
             targetTweetObj.replies.unshift(
                 {
                     handle: `@kassimfrontend`,
@@ -78,7 +90,8 @@ function handleReplyText(replyId){
                     tweetText: `${replyInput}`,
                 }
             )
-        replyInput='' 
+        replyInput=''
+        localStorage.setItem('tweetsData', JSON.stringify(tweetsData)) 
         render()
         handleReplyClick(replyId)
     }
@@ -86,7 +99,8 @@ function handleReplyText(replyId){
 
 function handleTweetBtnClick(){
     const tweetInput = document.getElementById('tweet-input')
-
+    let tweetsData=JSON.parse(localStorage.getItem('tweetsData'))
+    
     if(tweetInput.value){
         tweetsData.unshift({
             handle: `@kassimfrontend`,
@@ -99,6 +113,7 @@ function handleTweetBtnClick(){
             isRetweeted: false,
             uuid: uuidv4()
         })
+    localStorage.setItem('tweetsData', JSON.stringify(tweetsData))
     render()
     tweetInput.value = ''
     }
@@ -106,6 +121,7 @@ function handleTweetBtnClick(){
 }
 
 function getFeedHtml(){
+    let tweetsData=JSON.parse(localStorage.getItem('tweetsData'))
     let feedHtml = ``
     
     tweetsData.forEach(function(tweet){
@@ -127,63 +143,63 @@ function getFeedHtml(){
         if(tweet.replies.length > 0){
             tweet.replies.forEach(function(reply){
                 repliesHtml+=`
-<div class="tweet-reply">
-    <div class="tweet-inner">
-        <img src="${reply.profilePic}" class="profile-pic">
-            <div>
-                <p class="handle">${reply.handle}</p>
-                <p class="tweet-text">${reply.tweetText}</p>
-            </div>
-        </div>
-</div>
-`
+                <div class="tweet-reply">
+                    <div class="tweet-inner">
+                        <img src="${reply.profilePic}" class="profile-pic">
+                            <div>
+                                <p class="handle">${reply.handle}</p>
+                                <p class="tweet-text">${reply.tweetText}</p>
+                            </div>
+                        </div>
+                </div>
+                `
             })
         }
         
 
         feedHtml += `
-<div class="tweet">
-    <div class="tweet-inner">
-        <img src="${tweet.profilePic}" class="profile-pic">
-        <div>
-            <p class="handle">${tweet.handle}</p>
-            <p class="tweet-text">${tweet.tweetText}</p>
-            <div class="tweet-details">
-                <span class="tweet-detail">
-                    <i class="fa-regular fa-comment-dots"
-                    data-reply="${tweet.uuid}"
-                    ></i>
-                    ${tweet.replies.length}
-                </span>
-                <span class="tweet-detail">
-                    <i class="fa-solid fa-heart ${likeIconClass}"
-                    data-like="${tweet.uuid}"
-                    ></i>
-                    ${tweet.likes}
-                </span>
-                <span class="tweet-detail">
-                    <i class="fa-solid fa-retweet ${retweetIconClass}"
-                    data-retweet="${tweet.uuid}"
-                    ></i>
-                    ${tweet.retweets}
-                </span>
-                <span class="tweet-detail">
-                    <i class="fa-solid fa-trash"
-                    data-delete="${tweet.uuid}"
-                    ></i>
-                </span>
-            </div>   
-        </div>            
-    </div>
-    <div class="hidden" id="replies-${tweet.uuid}">
-          <textarea id="reply-text-${tweet.uuid}" placeholder="Reply here.."></textarea>
-          <button id="tweetreply-btn" data-comment="${tweet.uuid}">Reply</button>  
-        ${repliesHtml}
-    </div>   
-</div>
-`
-   })
-   return feedHtml 
+            <div class="tweet">
+                <div class="tweet-inner">
+                    <img src="${tweet.profilePic}" class="profile-pic">
+                    <div>
+                        <p class="handle">${tweet.handle}</p>
+                        <p class="tweet-text">${tweet.tweetText}</p>
+                        <div class="tweet-details">
+                            <span class="tweet-detail">
+                                <i class="fa-regular fa-comment-dots"
+                                data-reply="${tweet.uuid}"
+                                ></i>
+                                ${tweet.replies.length}
+                            </span>
+                            <span class="tweet-detail">
+                                <i class="fa-solid fa-heart ${likeIconClass}"
+                                data-like="${tweet.uuid}"
+                                ></i>
+                                ${tweet.likes}
+                            </span>
+                            <span class="tweet-detail">
+                                <i class="fa-solid fa-retweet ${retweetIconClass}"
+                                data-retweet="${tweet.uuid}"
+                                ></i>
+                                ${tweet.retweets}
+                            </span>
+                            <span class="tweet-detail">
+                                <i class="fa-solid fa-trash"
+                                data-delete="${tweet.uuid}"
+                                ></i>
+                            </span>
+                        </div>   
+                    </div>            
+                </div>
+                <div class="hidden" id="replies-${tweet.uuid}">
+                    <textarea id="reply-text-${tweet.uuid}" placeholder="Reply here.."></textarea>
+                    <button id="tweetreply-btn" data-comment="${tweet.uuid}">Reply</button>  
+                    ${repliesHtml}
+                </div>   
+            </div>
+            `
+    })
+    return feedHtml 
 }
 
 function render(){
@@ -191,4 +207,3 @@ function render(){
 }
 
 render()
-
