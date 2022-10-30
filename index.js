@@ -1,4 +1,4 @@
-import { allData } from './data.js'
+import { allData } from "./data.js"
 import { v4 as uuidv4 } from 'https://jspm.dev/uuid';
 
 if(!JSON.parse(localStorage.getItem('tweetsData'))){
@@ -53,7 +53,10 @@ function handleLikeClick(tweetId){
     }
     targetTweetObj.isLiked = !targetTweetObj.isLiked
     localStorage.setItem('tweetsData', JSON.stringify(tweetsData))
+    const repliesState = document.getElementById(`replies-${tweetId}`).classList[0]
     render()
+    keepRepliesState(tweetId,repliesState)
+    
 }
 
 function handleRetweetClick(tweetId){
@@ -70,11 +73,27 @@ function handleRetweetClick(tweetId){
     }
     targetTweetObj.isRetweeted = !targetTweetObj.isRetweeted
     localStorage.setItem('tweetsData', JSON.stringify(tweetsData))
-    render() 
+    const repliesState = document.getElementById(`replies-${tweetId}`).classList[0]
+    render()
+    keepRepliesState(tweetId,repliesState)
+    
+}
+
+function keepRepliesState(tweetId,state){
+    const elementToShow = document.getElementById(`replies-${tweetId}`)
+        elementToShow.classList.remove('hidden')
+        elementToShow.classList.add(state)
 }
 
 function handleReplyClick(replyId){
-    document.getElementById(`replies-${replyId}`).classList.toggle('hidden')
+    const elTotoggle = document.getElementById(`replies-${replyId}`)
+    if(elTotoggle.classList.contains('hidden')) {
+        elTotoggle.classList.remove('hidden')
+        elTotoggle.classList.add('show')
+    } else {
+        elTotoggle.classList.remove('show')
+        elTotoggle.classList.add('hidden')
+    }
 }
 
 function handleReplyText(replyId){
